@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<!-- mouvements_stock_historique.html : saisie entrée/sortie et consultation de l’historique. -->
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>StockIA.web — Mouvements</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="stockia-app page-mouvements">
+
+<div class="stockia-shell">
+    <aside id="stockia-sidebar-root" class="stockia-sidebar"></aside>
+    <div class="stockia-main">
+        <header class="stockia-topbar no-print d-flex align-items-center justify-content-between gap-2 flex-wrap py-2 px-3">
+            <span class="stockia-topbar-title h5 mb-0">Mouvements</span>
+            <button type="button" class="btn btn-outline-secondary btn-sm ms-auto" id="btn-print-mouvements" title="Enregistrer en PDF via le navigateur">Imprimer / PDF</button>
+        </header>
+
+        <div class="container-fluid stockia-content px-3 px-lg-4 py-3">
+    <h1 class="no-print">Mouvements de stock</h1>
+    <p class="text-muted no-print mb-1"><strong>Entrées</strong> augmentent le stock ; les <strong>sorties</strong> le diminuent (vente, perte ou autre). Une sortie ne peut pas dépasser la quantité disponible.</p>
+    <p class="small text-muted no-print mb-2"><a href="aide_stockia.html#mouvements">Aide — types de mouvements et prix à la vente</a></p>
+    <div id="erreur-mouvements" class="alert alert-danger py-2 d-none mb-2 no-print" role="alert"></div>
+    <div id="message-mouvements" class="alert alert-success py-2 d-none mb-2 no-print" role="status"></div>
+    <div id="info-stock-mouvement" class="alert py-2 mb-3 d-none no-print" role="status"></div>
+
+    <div class="card shadow-sm mb-4 no-print">
+        <div class="card-header">Nouveau mouvement</div>
+        <div class="card-body">
+            <form id="form-mouvement" class="row g-2 align-items-end">
+                <div class="col-md-3">
+                    <label class="form-label" for="mvt-product">Produit</label>
+                    <select class="form-select" id="mvt-product" required></select>
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label" for="mvt-type">Type</label>
+                    <select class="form-select" id="mvt-type" required>
+                        <option value="entree">entrée</option>
+                        <option value="sortie">sortie</option>
+                    </select>
+                </div>
+                <div class="col-md-2 d-none" id="bloc-mvt-sortie-kind">
+                    <label class="form-label" for="mvt-sortie-kind">Nature (sortie)</label>
+                    <select class="form-select" id="mvt-sortie-kind">
+                        <option value="vente">Vente / chantier</option>
+                        <option value="perte">Perte / casse</option>
+                        <option value="autre">Autre</option>
+                    </select>
+                </div>
+                <div class="col-md-2 d-none" id="bloc-mvt-prix-vente">
+                    <label class="form-label" for="mvt-prix-vente">Prix unitaire (vente)</label>
+                    <input type="number" class="form-control" id="mvt-prix-vente" min="0" step="0.01" placeholder="Catalogue">
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label" for="mvt-qty">Quantité</label>
+                    <input type="number" class="form-control" id="mvt-qty" min="1" value="1" required>
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label" for="mvt-note">Note (optionnel)</label>
+                    <input type="text" class="form-control" id="mvt-note">
+                </div>
+                <div class="col-md-1">
+                    <button type="submit" class="btn btn-primary w-100">OK</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="no-print mb-3">
+        <p class="small text-muted mb-2">Historique des mouvements</p>
+        <ul class="nav nav-tabs nav-tabs-mouvements" id="mvt-hist-tabs" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="tab-mvt-liste" data-bs-toggle="tab" data-bs-target="#pane-mvt-liste" type="button" role="tab" aria-controls="pane-mvt-liste" aria-selected="true">Liste</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="tab-mvt-recherche" data-bs-toggle="tab" data-bs-target="#pane-mvt-recherche" type="button" role="tab" aria-controls="pane-mvt-recherche" aria-selected="false">Recherche</button>
+            </li>
+        </ul>
+        <div class="tab-content tab-content-mouvements border border-top-0 rounded-bottom bg-white px-3 py-3">
+            <div class="tab-pane fade show active" id="pane-mvt-liste" role="tabpanel" aria-labelledby="tab-mvt-liste">
+                <label class="form-label small text-muted mb-1" for="filtre-product">Choisir un produit dans la liste</label>
+                <select id="filtre-product" class="form-select form-select-sm" style="max-width: 36rem"></select>
+            </div>
+            <div class="tab-pane fade" id="pane-mvt-recherche" role="tabpanel" aria-labelledby="tab-mvt-recherche">
+                <label class="form-label small text-muted mb-1" for="mvt-recherche-produit">Nom du produit ou réf. inventaire</label>
+                <input type="search" class="form-control form-control-sm" id="mvt-recherche-produit" placeholder="Ex. câble, ampoule, 34…" autocomplete="off" style="max-width: 36rem">
+                <div id="mvt-recherche-resultats" class="list-group list-group-flush mt-2 border rounded small" style="max-width: 36rem; max-height: 240px; overflow-y: auto;" role="listbox" aria-label="Produits correspondants"></div>
+                <p class="small text-muted mb-0 mt-2" id="mvt-recherche-vide">Tapez au moins une lettre ou un chiffre pour voir les produits correspondants.</p>
+                <button type="button" class="btn btn-outline-secondary btn-sm mt-2" id="mvt-recherche-tous">Tous les mouvements</button>
+            </div>
+        </div>
+    </div>
+    <div class="print-zone-mouvements">
+    <h2 class="h5 d-none d-print-block border-bottom pb-2 mb-3">Historique des mouvements — StockIA.web</h2>
+    <div class="table-responsive">
+        <table class="table table-striped table-sm" id="table-mouvements">
+            <thead>
+            <tr><th>Date</th><th>Produit</th><th>Type</th><th>Nature</th><th class="text-end">Quantité</th><th class="text-end">Prix vente</th><th>Note</th></tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
+    </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="client_api_rest_stockia.js"></script>
+<script>window.STOCKIA_PAGE = "mouvements";</script>
+<script src="layout_sidebar_stockia.js"></script>
+<script src="interface_mouvements_stock_historique.js"></script>
+</body>
+</html>

@@ -1,0 +1,27 @@
+backend/.venv/
+backend/__pycache__/
+backend/**/__pycache__/
+backend/stockia.db
+backend/stockia_nouvelle.db
+backend/tests/test_stockia.db
+backend/tests/_debug_stockia.db
+*.pyc
+*.db-shm
+*.db-wal
+
+# Fonds d’écran téléversés par les utilisateurs (garder le dossier avec .gitkeep)
+frontend/media/category_backgrounds/*
+!frontend/media/category_backgrounds/.gitkeep
+
+# Captures d’écran locales (non nécessaires au build)
+screenshots/
+Captures/
+
+# Fichiers système
+.DS_Store
+Thumbs.db
+
+.pytest_cache/
+*.db
+*.sqlite3
+.env

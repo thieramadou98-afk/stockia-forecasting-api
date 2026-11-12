@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>StockIA.web — Recherche & rayons</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="stockia-app page-catalogue-rayons">
+
+<div class="stockia-shell">
+    <aside id="stockia-sidebar-root" class="stockia-sidebar"></aside>
+    <div class="stockia-main">
+        <header class="stockia-topbar no-print d-flex align-items-center py-2 px-3">
+            <span class="stockia-topbar-title h5 mb-0">Recherche &amp; rayons</span>
+        </header>
+
+        <div class="container-fluid stockia-content px-3 px-lg-4 py-3">
+            <h1 class="h2">Recherche par produit</h1>
+            <p class="text-muted mb-1">Tapez un nom ou choisissez un article pour afficher sa fiche : <strong>stock</strong>, <strong>seuil</strong> et <strong>suggestions</strong> liées à vos mouvements.</p>
+            <p class="small text-muted mb-2"><a href="aide_stockia.html#recherche">Aide — lecture de la fiche produit</a></p>
+
+            <div class="card shadow-sm mb-3">
+                <div class="card-body">
+                    <label class="form-label fw-semibold" for="input-recherche-produit">Nom du produit</label>
+                    <input type="search" class="form-control form-control-lg mb-2" id="input-recherche-produit" list="datalist-produits" placeholder="Tapez pour filtrer…" autocomplete="off">
+                    <datalist id="datalist-produits"></datalist>
+                    <p class="small text-muted mb-2">Ou choisissez dans la liste défilante :</p>
+                    <div id="liste-produits-defilante" class="liste-defilante-produits border rounded list-group list-group-flush"></div>
+                </div>
+            </div>
+            <div id="fiche-produit-selectionne" class="d-none">
+                <div class="card border-primary shadow">
+                    <div class="card-header bg-primary text-white">Produit sélectionné</div>
+                    <div class="card-body" id="fiche-produit-corps"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="client_api_rest_stockia.js"></script>
+<script src="ia_affichage_utils.js"></script>
+<script>window.STOCKIA_PAGE = "rayons";</script>
+<script src="layout_sidebar_stockia.js"></script>
+<script src="interface_catalogue_previsions_rayons.js"></script>
+</body>
+</html>

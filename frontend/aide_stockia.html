@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>StockIA.web — Aide</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="stockia-app page-aide">
+
+<div class="stockia-shell">
+    <aside id="stockia-sidebar-root" class="stockia-sidebar"></aside>
+    <div class="stockia-main">
+        <header class="stockia-topbar no-print d-flex align-items-center py-2 px-3">
+            <span class="stockia-topbar-title h5 mb-0">Aide</span>
+        </header>
+
+        <div class="container-fluid stockia-content px-3 px-lg-4 py-3 pb-5">
+            <h1 class="h2">Guide d’utilisation</h1>
+            <p class="text-muted">Informations détaillées pour tirer le meilleur parti de StockIA.web.</p>
+
+            <nav class="card shadow-sm mb-4" aria-label="Sommaire">
+                <div class="card-body small">
+                    <strong>Sommaire :</strong>
+                    <a href="#tableau-de-bord" class="ms-2">Tableau de bord</a> ·
+                    <a href="#produits">Produits</a> ·
+                    <a href="#mouvements">Mouvements</a> ·
+                    <a href="#recherche">Recherche</a> ·
+                    <a href="#previsions">Prévisions IA</a> ·
+                    <a href="#ventes">Ventes</a> ·
+                    <a href="#rapport">Rapport / inventaire</a> ·
+                    <a href="#etablissement">Profil établissement</a>
+                </div>
+            </nav>
+
+            <section id="tableau-de-bord" class="mb-5">
+                <h2 class="h4">Tableau de bord</h2>
+                <p>Vue d’ensemble de vos stocks, des articles en alerte et des suggestions utiles.</p>
+                <p>Les graphiques et cartes liés à l’IA s’appuient sur l’historique des <strong>sorties</strong> pour estimer une consommation moyenne (souvent sur <strong>14 jours</strong>), une prévision courte, puis un <strong>point de commande</strong> : seuil de stock en dessous duquel une commande est recommandée (demande attendue pendant le <strong>délai fournisseur</strong> + marge de sécurité). Une <strong>quantité suggérée</strong> à commander est proposée lorsque le stock actuel ne couvre pas assez la demande à venir.</p>
+            </section>
+
+            <section id="produits" class="mb-5">
+                <h2 class="h4">Produits</h2>
+                <p>Vous gérez le catalogue (nom, rayon, seuil minimal, délai fournisseur en jours, prix indicatif, etc.). Le stock affiché est toujours calculé à partir des mouvements. Pour augmenter le stock au départ, enregistrez une <strong>entrée</strong> dans Mouvements après avoir créé l’article.</p>
+                <p>Le <strong>seuil minimal</strong> est le niveau à partir duquel vous souhaitez être alerté pour réapprovisionner. Le délai fournisseur alimente les calculs d’aide à la commande sur les autres pages.</p>
+            </section>
+
+            <section id="mouvements" class="mb-5">
+                <h2 class="h4">Mouvements</h2>
+                <p><strong>Entrée</strong> : réception ou achat (le stock augmente). <strong>Sortie</strong> : vente, perte ou autre motif (le stock diminue). Les sorties « vente » peuvent inclure un prix à la vente, utilisé dans le rapport Ventes.</p>
+                <p>Le système refuse une sortie qui dépasserait le stock disponible. Dans les listes, un survol peut afficher une référence pour distinguer deux noms proches.</p>
+            </section>
+
+            <section id="recherche" class="mb-5">
+                <h2 class="h4">Recherche &amp; rayons</h2>
+                <p>Recherche d’un article par nom ou référence : fiche avec stock actuel, seuil minimal, consommation moyenne observée sur les jours où il y a eu des sorties (fenêtre 14 jours), indicateur de point de commande et suggestion de commande issue du même modèle que sur le tableau de bord.</p>
+            </section>
+
+            <section id="previsions" class="mb-5">
+                <h2 class="h4">Prévisions IA par catégorie</h2>
+                <p>Un graphique par rayon : hauteur des barres liée à la quantité suggérée à commander et au stock par article. Une suggestion à <strong>0</strong> signifie qu’aucune commande n’est proposée pour cet article sur la base des données actuelles. Les calculs tiennent compte du délai fournisseur, d’une marge de sécurité et d’une couverture de quelques jours.</p>
+                <p class="fw-semibold mb-1">Abréviations sur les cartes (à droite du graphique)</p>
+                <ul>
+                    <li><strong>PdC</strong> — <strong>point de commande</strong> : seuil de stock en dessous duquel une commande devient pertinente, selon la demande estimée, le délai fournisseur et une marge de sécurité.</li>
+                    <li><strong>Cmd</strong> — <strong>quantité suggérée à commander</strong> pour l’article. La mention « Cmd : <em>aucune</em> » indique qu’aucune quantité n’est proposée.</li>
+                </ul>
+                <p class="small text-muted mb-0">Sur la page <strong>Recherche &amp; rayons</strong>, les mêmes notions sont affichées en toutes lettres (point de commande, quantité suggérée, conso. moyenne, prévision IA, stock sécurité, etc.).</p>
+            </section>
+
+            <section id="ventes" class="mb-5">
+                <h2 class="h4">Ventes</h2>
+                <p>Tableau des articles vendus sur la période (sorties enregistrées comme « vente » dans Mouvements). Seules les lignes avec quantité vendue strictement positive sont listées. Le montant utilise le prix à la vente saisi sur le mouvement si présent, sinon le prix catalogue de l’article.</p>
+            </section>
+
+            <section id="rapport" class="mb-5">
+                <h2 class="h4">Rapport / inventaire</h2>
+                <p><strong>Stock début</strong> : état issu des mouvements avant la date de début ; l’affichage plafonne à zéro par ligne.</p>
+                <p><strong>Stock fin (théorique)</strong> : stock début + entrées − toutes les sorties sur la période, toujours affiché avec un plancher à zéro. Il s’agit d’une vue comptable issue du journal, pas d’un inventaire physique sur le terrain.</p>
+                <p>Vous pouvez imprimer ou enregistrer en PDF via le navigateur. La colonne « Observation (manuscrit) » est prévue pour des annotations sur papier.</p>
+            </section>
+
+            <section id="etablissement" class="mb-5">
+                <h2 class="h4">Profil établissement (coordonnées)</h2>
+                <p>Le nom du magasin ou de l’entreprise, le courriel, le téléphone et l’adresse sont enregistrés avec votre compte. Ils apparaissent en haut à droite des pages et sur les fiches imprimables (ventes, inventaire). Vous pouvez les modifier depuis la page <a href="profil_etablissement.html">Profil établissement</a>.</p>
+            </section>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="client_api_rest_stockia.js"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        if (!lireJeton()) {
+            window.location.href = "connexion_utilisateur.html";
+        }
+    });
+</script>
+<script>window.STOCKIA_PAGE = "aide";</script>
+<script src="layout_sidebar_stockia.js"></script>
+</body>
+</html>

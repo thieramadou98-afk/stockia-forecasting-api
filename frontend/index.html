@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<!-- index.html : tableau de bord principal (stocks, alertes, IA, graphique). -->
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>StockIA.web — Tableau de bord</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="stockia-app page-dashboard">
+
+<div class="stockia-shell">
+    <aside id="stockia-sidebar-root" class="stockia-sidebar"></aside>
+    <div class="stockia-main">
+        <header class="stockia-topbar no-print d-flex align-items-center py-2 px-3">
+            <span class="stockia-topbar-title h5 mb-0">Tableau de bord</span>
+        </header>
+
+        <div class="container-fluid stockia-content px-3 px-lg-4 py-3 pb-5">
+            <h1 class="h2">Vue d’ensemble</h1>
+            <p class="text-muted mb-2">Suivez vos <strong>stocks</strong>, les <strong>alertes</strong> de réapprovisionnement et les <strong>suggestions</strong> de commande. Les indicateurs reflètent ce que vous enregistrez dans <strong>Mouvements</strong> (entrées et sorties).</p>
+            <p class="small text-muted mb-3"><a href="aide_stockia.html#tableau-de-bord">Aide — explication des graphiques et de l’IA</a></p>
+
+            <div class="dashboard-welcome border border-warning border-opacity-50 shadow-sm mb-4" role="note">
+                <strong>À savoir :</strong> chaque carte résume un article (activité récente et proposition de commande si utile). Le menu <strong>Aide</strong> explique les libellés et calculs.
+            </div>
+
+            <div id="erreur-dashboard" class="alert alert-danger d-none"></div>
+
+            <div class="row g-3 mb-3">
+                <div class="col-6 col-xl-3">
+                    <button type="button" class="kpi-tile-btn kpi-tile-link d-block w-100 h-100 text-reset rounded-3 border-0 p-0 bg-transparent text-start" data-kpi-detail="catalogue" aria-label="Afficher la liste de tous les articles">
+                        <div class="card kpi-tile kpi-tile--produits shadow-sm border-0 h-100">
+                            <div class="card-body">
+                                <div class="kpi-tile-label">Articles au catalogue</div>
+                                <p class="kpi-tile-value mb-0" id="kpi-produits">—</p>
+                            </div>
+                        </div>
+                    </button>
+                </div>
+                <div class="col-6 col-xl-3">
+                    <button type="button" class="kpi-tile-btn kpi-tile-link d-block w-100 h-100 text-reset rounded-3 border-0 p-0 bg-transparent text-start" data-kpi-detail="reappro" aria-label="Afficher les articles au seuil ou en dessous">
+                        <div class="card kpi-tile kpi-tile--seuil shadow-sm border-0 h-100">
+                            <div class="card-body">
+                                <div class="kpi-tile-label">Réappro. (au seuil ou dessous)</div>
+                                <p class="kpi-tile-value mb-0 text-warning" id="kpi-alertes">—</p>
+                            </div>
+                        </div>
+                    </button>
+                </div>
+                <div class="col-6 col-xl-3">
+                    <button type="button" class="kpi-tile-btn kpi-tile-link kpi-tile-link--rupture d-block w-100 h-100 rounded-3 border-0 p-0 bg-transparent text-start text-white" data-kpi-detail="rupture" aria-label="Afficher les articles dont le stock est à zéro">
+                        <div class="card kpi-tile kpi-tile--rupture shadow-sm border-0 h-100">
+                            <div class="card-body">
+                                <div class="kpi-tile-label">Stock = 0</div>
+                                <p class="kpi-tile-value mb-0 text-white" id="kpi-ruptures">—</p>
+                            </div>
+                        </div>
+                    </button>
+                </div>
+                <div class="col-6 col-xl-3">
+                    <button type="button" class="kpi-tile-btn kpi-tile-link kpi-tile-link--rayons d-block w-100 h-100 rounded-3 border-0 p-0 bg-transparent text-start" data-kpi-detail="rayons" aria-label="Afficher la liste des rayons et le nombre d’articles par rayon">
+                        <div class="card kpi-tile kpi-tile--rayons shadow-sm border-0 h-100">
+                            <div class="card-body">
+                                <div class="kpi-tile-label">Rayons (catégories)</div>
+                                <p class="kpi-tile-value mb-0" id="kpi-rayons">—</p>
+                            </div>
+                        </div>
+                    </button>
+                </div>
+            </div>
+            <p class="small text-muted mb-3">Astuce : <strong>cliquez une carte</strong> pour afficher la <strong>liste détaillée</strong> ici (sans quitter le tableau de bord). Utilisez <strong>Fermer</strong> ou recliquez une autre carte pour changer de vue.</p>
+
+            <div id="panneau-detail-kpi" class="card shadow-sm border mb-4 d-none no-print" role="region" aria-labelledby="panneau-detail-kpi-titre">
+                <div class="card-header bg-white border-bottom py-2 d-flex justify-content-between align-items-center flex-wrap gap-2">
+                    <h3 class="h6 mb-0 fw-semibold" id="panneau-detail-kpi-titre"></h3>
+                    <button type="button" class="btn btn-sm btn-outline-secondary" id="btn-fermer-detail-kpi">Fermer</button>
+                </div>
+                <div class="card-body p-0 table-responsive dashboard-kpi-detail-scroll">
+                    <table class="table table-sm table-striped mb-0 align-middle" id="table-detail-kpi">
+                        <thead class="table-light"></thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="row g-3 mb-4 no-print">
+                <div class="col-lg-6">
+                    <div class="card shadow-sm h-100 border-0">
+                        <div class="card-header bg-white py-2 d-flex justify-content-between align-items-center flex-wrap gap-1">
+                            <span class="fw-semibold">Plus fortes sorties</span>
+                            <span class="small text-muted" id="widgets-periode-libelle">—</span>
+                        </div>
+                        <ul class="list-group list-group-flush" id="liste-top-sorties"></ul>
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <div class="card shadow-sm h-100 border-0">
+                        <div class="card-header bg-white py-2 fw-semibold">Derniers articles au catalogue</div>
+                        <ul class="list-group list-group-flush" id="liste-recents-catalogue"></ul>
+                    </div>
+                </div>
+            </div>
+
+            <h2 class="h4 mt-4 mb-2">Stock par article</h2>
+            <p class="small text-muted mb-2">Barres = quantité disponible (voir l’infobulle pour le seuil minimal). Faites défiler si vous avez beaucoup d’articles.</p>
+            <div class="card shadow-sm mb-2 p-3 bg-white rounded-3 border">
+                <div id="wrap-graphique-stocks" class="dashboard-chart-wrap">
+                    <canvas id="graphique-stocks"></canvas>
+                </div>
+            </div>
+
+            <h2 class="h4 mt-5 mb-2">Prévisions &amp; recommandations (IA)</h2>
+            <p class="small text-muted mb-3" id="ia-section-aide">Chaque carte résume un article. La <strong>conso. moy. (fenêtre)</strong> est la moyenne des <strong>sorties par jour</strong> sur les <strong>14 derniers jours</strong>, calculée sur les jours où il y a eu au moins une sortie (0 = aucune sortie dans cette fenêtre). La <strong>prévision IA</strong> combine régression, moyenne mobile et forêt aléatoire. Le <strong>point de commande</strong> intègre délai fournisseur et stock de sécurité ; la <strong>suggestion</strong> vise à dépasser ce niveau et à couvrir encore quelques jours de demande estimée.</p>
+            <div class="row g-3" id="cartes-ia"></div>
+
+            <h2 class="h4 mt-5">Derniers mouvements</h2>
+            <div class="table-responsive">
+                <table class="table table-striped table-sm" id="tableau-mouvements">
+                    <thead><tr><th>Date</th><th>Produit</th><th>Type</th><th>Nature</th><th class="text-end">Quantité</th><th>Note</th></tr></thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+
+            <p class="text-center text-muted small mt-4 mb-0 dashboard-footer-note">StockIA.web — inventaire &amp; prévisions · <span id="dashboard-horodatage"></span></p>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script src="client_api_rest_stockia.js"></script>
+<script src="ia_affichage_utils.js"></script>
+<script src="theme_stockia_web.js"></script>
+<script>window.STOCKIA_PAGE = "dashboard";</script>
+<script src="layout_sidebar_stockia.js"></script>
+<script src="interface_tableau_bord_stockia.js"></script>
+</body>
+</html>

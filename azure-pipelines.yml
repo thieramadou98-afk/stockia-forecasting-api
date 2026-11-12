@@ -1,0 +1,55 @@
+# =============================================================================
+# Azure DevOps — StockIA.web (build Docker + push ACR + déploiement Web App)
+# =============================================================================
+
+trigger:
+  branches:
+    include:
+      - main
+
+pool:
+  vmImage: ubuntu-latest
+
+variables:
+  imageRepository: stockia-web
+  dockerfilePath: $(Build.SourcesDirectory)/Dockerfile
+  buildTag: $(Build.BuildId)
+
+  # --- Renseigner ces valeurs (ou les surcharger dans l’UI Variables du pipeline) ---
+  azureSubscription: "Azure-StockIA-RG" 
+  acrServiceConnection: "ACR-StockIA" 
+  containerRegistry: "stockiaacr2026.azurecr.io" 
+  appName: "stockia-web-2026" 
+
+stages:
+  - stage: BuildAndPush
+    displayName: Build et push image
+    jobs:
+      - job: Docker
+        displayName: Docker build push
+        steps:
+          - task: Docker@2
+            displayName: Build and push to ACR
+            inputs:
+              command: buildAndPush
+              repository: $(imageRepository)
+              dockerfile: $(dockerfilePath)
+              containerRegistry: $(acrServiceConnection)
+              buildContext: $(Build.SourcesDirectory)
+              tags: |
+                $(buildTag)
+                latest
+
+  - stage: Deploy
+    displayName: Deploy Web App
+    dependsOn: BuildAndPush
+    jobs:
+      - job: WebDeploy
+        displayName: Mettre à jour le conteneur
+        steps:
+          - task: AzureWebAppContainer@1
+            displayName: Azure Web App for Containers
+            inputs:
+              azureSubscription: $(azureSubscription)
+              appName: $(appName)
+              containers: $(containerRegistry)/$(imageRepository):$(buildTag)
